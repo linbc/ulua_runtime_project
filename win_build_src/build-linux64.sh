@@ -13,13 +13,8 @@ mkdir -p linux/x86_64
 cd luajit
 make clean
 
-make BUILDMODE=static CC="gcc -fPIC -m64"
+make -j4 BUILDMODE=static CC="gcc -fPIC -m64"
 cp src/libluajit.a ../linux/libluajit.a
-
-cd ../pbc/
-make clean
-make BUILDMODE=static CC="gcc -fPIC -m64"
-cp build/libpbc.a ../linux/x86_64/libpbc.a
 
 cd ../cjson/
 make clean
@@ -29,19 +24,12 @@ cp build/libcjson.a ../linux/x86_64/libcjson.a
 cd ..
 gcc -fPIC \
 	lua_wrap.c \
-	pb_win.c \
-	lpeg.c \
-	sproto.c \
-	lsproto.c \
-	pbc/binding/lua/pbc-lua.c \
 	cjson/lua_cjson.c \
 	-o Plugins/x86_64/libulua.so -shared \
 	-I./ \
 	-Iluajit/src \
-	-Ipbc \
 	-Icjson \
 	-Wl,--whole-archive \
-	linux/x86_64/libluajit.a \
-	linux/x86_64/libpbc.a \
+	linux/libluajit.a \
 	linux/x86_64/libcjson.a \
 	-Wl,--no-whole-archive -static-libgcc -static-libstdc++
